@@ -23,6 +23,13 @@ in
   config = mkIf cfg.enable {
     programs.nixvim = {
         enable = true;
+        # Pin nixvim's nixpkgs to the one home-manager already uses (pkgs.path).
+        # nixvim's flake pins a different nixpkgs rev than our
+        # `inputs.nixvim.inputs.nixpkgs.follows`, so the default `nixpkgs.source`
+        # emits an eval-time warning about the divergence on every nixpkgs bump.
+        # Setting it explicitly silences that permanently with no build change —
+        # it's the same nixpkgs nixvim was already resolving to via the follows.
+        nixpkgs.source = pkgs.path;
         defaultEditor = true;
         viAlias = true;
         vimAlias = true;
