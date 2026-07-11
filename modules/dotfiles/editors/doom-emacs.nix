@@ -20,7 +20,6 @@ in
       gnumake
       python3
       isort
-      pipenv
       shellcheck
       nixfmt
       nerd-fonts.jetbrains-mono
