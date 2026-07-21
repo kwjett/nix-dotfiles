@@ -538,6 +538,12 @@ in
           (nmap "<Leader>tt" "<cmd>TermExec cmd=btop direction=float<cr>"   "btop")
           # In terminal mode, <Esc> escapes to normal mode (AstroNvim default).
           (tmap "<Esc>" "<C-\\><C-n>" "Exit terminal mode")
+          # Send a literal newline (LF, i.e. <C-j>) on Shift+Enter inside a
+          # :terminal so multiline-input TUIs like Claude Code can tell it
+          # apart from Enter. Only fires when the outer terminal actually
+          # delivers a distinct Shift+Enter (Ghostty & other kitty-protocol
+          # terminals); elsewhere it lies dormant and <C-j> still works.
+          (tmap "<S-CR>" "<C-j>" "Newline (multiline TUI input)")
 
           # ─── Session (<Leader>S) — persistence.nvim ─────────────────
           (nmap "<Leader>Sl" "<cmd>lua require('persistence').load({ last = true })<cr>" "Load last session")
