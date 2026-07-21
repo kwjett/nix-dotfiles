@@ -95,6 +95,14 @@ in
           # Enable true color support
           set -ga terminal-overrides ",xterm-256color:Tc"
 
+          # Let modified keys like Shift+Enter pass through tmux so TUIs such as
+          # Claude Code can distinguish Shift+Enter from Enter. Only has an
+          # effect when the outer terminal actually emits them (Ghostty and
+          # other terminals that support the extended-keys / CSI-u protocol);
+          # harmless everywhere else.
+          set -s extended-keys on
+          set -as terminal-features 'xterm*:extkeys'
+
           # Set Bind Keys
           bind-key -n M-x kill-pane
           bind-key -n M-c new-window
