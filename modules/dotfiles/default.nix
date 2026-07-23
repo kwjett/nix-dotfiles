@@ -32,6 +32,7 @@ with lib;
       nixvim = {
         enable = mkEnableOption "Pure-nixvim editor configuration";
         claudeCode.enable = mkEnableOption "Claude Code integration inside nvim (greggh/claude-code.nvim)";
+        neoTree.autoStart = mkEnableOption "opening the neo-tree file explorer automatically on startup";
       };
     };
   };

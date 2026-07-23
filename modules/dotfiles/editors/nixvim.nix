@@ -381,10 +381,12 @@ in
             end
           end
 
+          ${optionalString cfg.neoTree.autoStart ''
           -- Open neo-tree on startup without taking focus.
           vim.api.nvim_create_autocmd("VimEnter", {
             callback = function() vim.cmd("Neotree show") end,
           })
+          ''}
 
           -- Close-all-buffers-but-current — small helper for `<Leader>bC`.
           function _G.CloseOtherBuffers()
