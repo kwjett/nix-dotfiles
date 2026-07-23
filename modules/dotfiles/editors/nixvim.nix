@@ -83,6 +83,10 @@ in
                   { source = "git_status";  display_name = " 󰊢 Git "; }
                 ];
               };
+              # Auto-refresh the tree when the filesystem changes underneath
+              # it (files created/renamed/deleted by other tools), via OS-level
+              # libuv file watchers instead of manual `R`.
+              filesystem.use_libuv_file_watcher = true;
               filesystem.filtered_items = {
                 hide_dotfiles = false;
                 hide_gitignored = false;
