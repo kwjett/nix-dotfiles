@@ -129,6 +129,28 @@ in
 
           # Additional Options
           set-option -g status-position bottom
+
+          # Drop supplementary-plane private-use glyphs from the status line.
+          #
+          # Termius on iOS measures a glyph's advance from the font instead of
+          # consulting a width table, and renders U+F0000+ private-use glyphs
+          # two columns wide; tmux, via utf8proc, counts them as one. The
+          # tokyo-night theme puts one such glyph in status-left (the prefix
+          # indicator) plus one per ssh window, so the bar draws wider than
+          # tmux believes, overruns the final column, wraps, and scrolls
+          # itself off screen -- which also drags mouse click targets out of
+          # alignment with what is painted.
+          #
+          # Basic-plane private-use glyphs (U+E000-U+F8FF, e.g. the per-window
+          # terminal icon) measure correctly in both and are left alone, so
+          # the window list keeps its icons. Only the prefix and ssh icons go.
+          #
+          # Must run after the theme's own run-shell, which is why it lives in
+          # extraConfig: home-manager emits plugin config before this block.
+          # Rewrites the stored option values, so glyphs a widget prints at
+          # runtime via #() are not covered -- none of the enabled widgets do.
+          # Delete this run-shell to get the icons back.
+          run-shell 'for o in status-left status-right window-status-format window-status-current-format; do tmux set -g "$o" "$(tmux show -gv "$o" | ${pkgs.perl}/bin/perl -CSD -pe "s/[\x{f0000}-\x{ffffd}\x{100000}-\x{10fffd}]//g")"; done'
           # set-option -g allow-rename off
           # set-option -g status-interval 3
           # set-option -g automatic-rename on
