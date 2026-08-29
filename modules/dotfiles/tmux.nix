@@ -122,10 +122,12 @@ in
           bind-key -n C-S-Left resize-pane -L
           bind-key -n C-S-Right resize-pane -R
           bind-key -n M-y copy-mode
-          bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "xclip -selection c"
-          bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+          # Copy via set-clipboard/OSC 52 above, so no clipboard binary is
+          # needed on PATH and the selection survives an SSH hop.
+          bind-key -T copy-mode-vi Enter send -X copy-selection-and-cancel
+          bind-key -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection-and-cancel
           bind-key -T copy-mode-vi 'v' send -X begin-selection
-          bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+          bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
 
           # Additional Options
           set-option -g status-position bottom
