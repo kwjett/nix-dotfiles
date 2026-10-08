@@ -14,6 +14,19 @@ let
         hash = "sha256-TOS9+eOEMInAgosB3D9KhahudW2i1ZEH+IXEc0RCpU0=";
       };
     };
+  tmux = "${config.programs.tmux.package}/bin/tmux";
+  # Rewrites tmux's own right-click menus rather than copying them, so they
+  # keep tracking upstream; already-patched entries no longer match on reload.
+  mouseMenuDirs = pkgs.writeShellScript "tmux-mouse-menu-dirs" ''
+    f=$(${pkgs.coreutils}/bin/mktemp)
+    ${tmux} list-keys -T root \
+      | ${pkgs.gnugrep}/bin/grep -E '^bind-key +-T root +(M-)?MouseDown3(Pane|Status) ' \
+      | ${pkgs.gnused}/bin/sed \
+          -e 's/{ split-window -\([hv]\) }/{ split-window -\1 -c "#{pane_current_path}" }/g' \
+          -e 's/{ new-window\( -a\)\? }/{ new-window\1 -c "$HOME" }/g' > "$f"
+    ${tmux} source-file "$f"
+    ${pkgs.coreutils}/bin/rm -f "$f"
+  '';
 in
 
 {
@@ -105,11 +118,11 @@ in
 
           # Set Bind Keys
           bind-key -n M-x kill-pane
-          bind-key -n M-c new-window
+          bind-key -n M-c new-window -c "$HOME"
           bind -n M-Right next-window
           bind -n M-Left previous-window
-          bind-key -n M-h split-window -h
-          bind-key -n M-v split-window -v
+          bind-key -n M-h split-window -h -c "#{pane_current_path}"
+          bind-key -n M-v split-window -v -c "#{pane_current_path}"
           bind-key -n M-o select-pane -t :.+
           bind-key M-a last-window
           bind-key -n F10 resize-pane -Z
@@ -122,6 +135,10 @@ in
           bind-key -n C-S-Left resize-pane -L
           bind-key -n C-S-Right resize-pane -R
           bind-key -n M-y copy-mode
+          # Splits follow the pane's cwd, new windows start in home. Overrides
+          # pain-control's prefix-c, which opens in the pane's cwd.
+          bind-key c new-window -c "$HOME"
+          run-shell ${mouseMenuDirs}
           # Copy via set-clipboard/OSC 52 above, so no clipboard binary is
           # needed on PATH and the selection survives an SSH hop.
           bind-key -T copy-mode-vi Enter send -X copy-selection-and-cancel
