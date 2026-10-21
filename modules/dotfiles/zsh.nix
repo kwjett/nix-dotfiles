@@ -23,7 +23,7 @@
           nano = "vim"; # No one should ever use nano :)
           diff = "difft"; # Use difftastic, syntax-aware diffing
           search = "rg -p --glob '!node_modules/*'  $@"; # Ripgrep alias
-        } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
           dnsflush = "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder";
         };
         history = {
@@ -72,7 +72,7 @@
               nix-shell '<nixpkgs>' -A "$1"
           }
 
-          ${lib.optionalString pkgs.stdenv.isDarwin "\n            # Disable mouse reporting when prompt is shown (fixes ghost mouse input after SSH disconnect in Ghostty)\n            precmd_mouse_reset() { print -n \$'\\033[?1000l\\033[?1002l\\033[?1006l'; }\n            autoload -Uz add-zsh-hook\n            add-zsh-hook precmd precmd_mouse_reset"}
+          ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin "\n            # Disable mouse reporting when prompt is shown (fixes ghost mouse input after SSH disconnect in Ghostty)\n            precmd_mouse_reset() { print -n \$'\\033[?1000l\\033[?1002l\\033[?1006l'; }\n            autoload -Uz add-zsh-hook\n            add-zsh-hook precmd precmd_mouse_reset"}
         '';
       };
     };
